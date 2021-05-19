@@ -55,7 +55,7 @@ int buffer_size = sizeof(buffer)>>1;
    Function for calculating the Root Mean Square of sample buffer.
    RMS can calculate an average amplitude of buffer.
 */
-double rms(short *buffer, bool is_left)
+double rms(short *buffer, _Bool is_left)
 {
     int i;
     long int square_sum = 0.0;
@@ -69,7 +69,7 @@ double rms(short *buffer, bool is_left)
     return result;
 }
 
-double calculate_peak(short *buffer, bool is_left)
+double calculate_peak(short *buffer, _Bool is_left)
 {
     int i;
     int max = buffer[0];
@@ -89,28 +89,46 @@ double calculate_peak(short *buffer, bool is_left)
 /*
    Show the sound level and its peak value
 */
-void show(int Pvalue, int peak)
+void show(int PvalueL, int peakL, int PvalueR, int peakR)
 {
     int j;
-    int dB;
-    int dBpeak;
+    int dBL;
+    int dBpeakL;
+    int dBR;
+    int dBpeakR;
 
     for(j=0; j<13; j++)
         printf("\b");
     fflush(stdout);
 
-    if(Pvalue > 0)
+    if(PvalueL > 0)
     {
-        dB = (int)20 * log10(Pvalue);
-        printf("%d,", dB);
+        dBL = (int)20 * log10(PvalueL);
+        printf("%d,", dBL);
     }
     else
         printf("0,");
 
-    if(peak > 0)
+    if(peakL > 0)
     {
-        dBpeak = (int)20 * log10(peak);
-        printf("%d", dBpeak);
+        dBpeakL = (int)20 * log10(peakL);
+        printf("%d,", dBpeakL);
+    }
+    else
+        printf("0,");
+
+    if(PvalueR > 0)
+    {
+        dBR = (int)20 * log10(PvalueR);
+        printf("%d,", dBR);
+    }
+    else
+        printf("0,");
+
+    if(peakR > 0)
+    {
+        dBpeakR = (int)20 * log10(peakR);
+        printf("%d", dBpeakR);
     }
     else
         printf("0");
@@ -148,8 +166,10 @@ int main(void)
        and by experiment, we found that k = 0.45255.
     */
     double k = 0.45255;
-    double Pvalue = 0;
-    double peak = 0;
+    double PvalueL = 0;
+    double peakL = 0;
+    double PvalueR = 0;
+    double peakR = 0;
 
     // Capture
     while(1) {
@@ -169,12 +189,12 @@ int main(void)
         }
 
         // Successfully read, calculate dB and update peak value
-        PvalueL = rms(buffer) * k;
-        PvalueR = rms(buffer) * k;
-        peakL = calculate_peak(buffer);
-        peakR = calculate_peak(buffer);
+        PvalueL = rms(buffer, true) * k;
+        PvalueR = rms(buffer, false) * k;
+        peakL = calculate_peak(buffer, true);
+        peakR = calculate_peak(buffer, false);
 
-        show(Pvalue, peak);
+        show(PvalueL, peakL, PvalueR, peakR);
     }
     printf("\n");
     snd_pcm_close(handle_capture);
