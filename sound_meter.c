@@ -185,7 +185,7 @@ int main(void)
             }
         }
 
-        if(frames > 0 && frames < (long)buffer_size) {
+        if(frames > 0 && frames < (long)(buffer_size / 2)) {
             printf("Short read (expected %li, read %li)\n", (long)buffer_size, frames);
         }
 
