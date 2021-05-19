@@ -66,6 +66,17 @@ double rms(short *buffer)
     return result;
 }
 
+double calculate_peak(short *buffer)
+{
+    int i;
+    int max = buffer[0];
+    for(i=0; i<buffer_size; i++)
+        if (buffer[i] > max)
+            max = buffer[i];
+
+    return max;
+}
+
 /*
    Show the sound level and its peak value
 */
@@ -82,18 +93,18 @@ void show(int Pvalue, int peak)
     if(Pvalue > 0)
     {
         dB = (int)20 * log10(Pvalue);
-        printf("dB=%d,", dB);
+        printf("%d,", dB);
     }
     else
-        printf("dB=--,");
+        printf("0,");
 
     if(peak > 0)
     {
         dBpeak = (int)20 * log10(peak);
-        printf("Peak=%d", dBpeak);
+        printf("%d", dBpeak);
     }
     else
-        printf("Peak=--", dB, peak);
+        printf("0");
 
     fflush(stdout);
 }
@@ -150,8 +161,7 @@ int main(void)
         
         // Successfully read, calculate dB and update peak value
         Pvalue = rms(buffer) * k;
-        if(Pvalue > peak)
-            peak = Pvalue;
+        peak = calculate_peak(buffer);
         
         show(Pvalue, peak);
     }
