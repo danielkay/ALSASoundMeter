@@ -153,7 +153,7 @@ int main(void)
     err = snd_pcm_set_params(handle_capture,
                              SND_PCM_FORMAT_S16_LE,
                              SND_PCM_ACCESS_RW_INTERLEAVED,
-                             1,
+                             2,
                              48000,
                              1,
                              500000);
