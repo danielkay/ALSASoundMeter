@@ -44,7 +44,7 @@ static char *device = "default";
    Sampling frequency = 48000Hz, in other words, sound
    card will record the sample value every 1/48000 second.
 */
-short buffer[8*1024*2];
+short buffer[8*2048*2];
 
 /*
    The unit of sizeof() function is byte, so we have to
