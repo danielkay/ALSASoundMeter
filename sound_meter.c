@@ -43,7 +43,7 @@ static char *device = "default";
    Sampling frequency = 48000Hz, in other words, sound
    card will record the sample value every 1/48000 second.
 */
-short buffer[8*1024];
+short buffer[8*2048];
 
 /*
    The unit of sizeof() function is byte, so we have to
@@ -55,24 +55,33 @@ int buffer_size = sizeof(buffer)>>1;
    Function for calculating the Root Mean Square of sample buffer.
    RMS can calculate an average amplitude of buffer.
 */
-double rms(short *buffer)
+double rms(short *buffer, bool is_left)
 {
     int i;
     long int square_sum = 0.0;
     for(i=0; i<buffer_size; i++)
-        square_sum += (buffer[i] * buffer[i]);
+        if(is_left == true)
+            square_sum += (buffer[i] * buffer[i]);
+        else
+            square_sum += (buffer[i+1] * buffer[i+1]);
 
-    double result = sqrt(square_sum/buffer_size);
+    double result = sqrt(square_sum/(buffer_size/2));
     return result;
 }
 
-double calculate_peak(short *buffer)
+double calculate_peak(short *buffer, bool is_left)
 {
     int i;
     int max = buffer[0];
     for(i=0; i<buffer_size; i++)
-        if (buffer[i] > max)
-            max = buffer[i];
+        if(is_left == true) {
+            if (buffer[i] > max)
+                max = buffer[i];
+        } else {
+            if (buffer[i+1] > max)
+                max = buffer[i+1];
+        }
+
 
     return max;
 }
@@ -113,7 +122,7 @@ int main(void)
 {
     snd_pcm_t *handle_capture;
     snd_pcm_sframes_t frames;
-    
+
     int err;
 
     err = snd_pcm_open(&handle_capture, device, SND_PCM_STREAM_CAPTURE, 0);
@@ -144,7 +153,7 @@ int main(void)
 
     // Capture
     while(1) {
-        
+
         frames = snd_pcm_readi(handle_capture, buffer, buffer_size);
 
         if(frames < 0) {
@@ -158,11 +167,13 @@ int main(void)
         if(frames > 0 && frames < (long)buffer_size) {
             printf("Short read (expected %li, read %li)\n", (long)buffer_size, frames);
         }
-        
+
         // Successfully read, calculate dB and update peak value
-        Pvalue = rms(buffer) * k;
-        peak = calculate_peak(buffer);
-        
+        PvalueL = rms(buffer) * k;
+        PvalueR = rms(buffer) * k;
+        peakL = calculate_peak(buffer);
+        peakR = calculate_peak(buffer);
+
         show(Pvalue, peak);
     }
     printf("\n");
