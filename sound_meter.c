@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include<alsa/asoundlib.h>
 #include<math.h>
+#include <stdbool.h>
 
 /*
    Device name.
@@ -55,7 +56,7 @@ int buffer_size = sizeof(buffer)>>1;
    Function for calculating the Root Mean Square of sample buffer.
    RMS can calculate an average amplitude of buffer.
 */
-double rms(short *buffer, _Bool is_left)
+double rms(short *buffer, bool is_left)
 {
     int i;
     long int square_sum = 0.0;
@@ -69,7 +70,7 @@ double rms(short *buffer, _Bool is_left)
     return result;
 }
 
-double calculate_peak(short *buffer, _Bool is_left)
+double calculate_peak(short *buffer, bool is_left)
 {
     int i;
     int max = buffer[0];
