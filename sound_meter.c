@@ -60,11 +60,14 @@ double rms(short *buffer, bool is_left)
 {
     int i;
     long int square_sum = 0.0;
-    for(i=0; i<buffer_size; i++)
-        if(is_left == true)
+    if(is_left == true) {
+        for(i=0; i<buffer_size; i++)
             square_sum += (buffer[i] * buffer[i]);
-        else
-            square_sum += (buffer[i+1] * buffer[i+1]);
+    } else {
+        for(i=0; i<buffer_size; i++)
+            i++;
+            square_sum += (buffer[i] * buffer[i]);
+    }
 
     double result = sqrt(square_sum/(buffer_size/2));
     return result;
@@ -74,15 +77,16 @@ double calculate_peak(short *buffer, bool is_left)
 {
     int i;
     int max = buffer[0];
-    for(i=0; i<buffer_size; i++)
-        if(is_left == true) {
+    if(is_left == true) {
+        for (i = 0; i < buffer_size; i++)
             if (buffer[i] > max)
                 max = buffer[i];
-        } else {
-            if (buffer[i+1] > max)
-                max = buffer[i+1];
-        }
-
+    } else {
+        for (i = 0; i < buffer_size; i++)
+            i++;
+            if (buffer[i] > max)
+                max = buffer[i];
+    }
 
     return max;
 }
